@@ -140,15 +140,37 @@ namespace UNIVERSITY_MANAGEMENT.Properties
 
             using (SqlDataReader dr = ExecuteReader(displayFaculty, parameters))
             {
-                Console.WriteLine("{0,-6} {1,-12} {2,-10}", "ID", "Name", "Department");
-                Console.WriteLine(new string('-', 35));
+            
+                int currentFacultyId = -1;  // To track the current faculty ID
+                bool firstCourse = true;
+            
+                Console.WriteLine("{0,-6} {1,-12} {2,-15} {3,-10}", "ID", "Name", "Department","Courses");
+                Console.WriteLine(new string('-', 60));
                 while (dr.Read())
                 {
-                    string id = dr.GetInt32(0).ToString();
+                    int id = dr.GetInt32(0);
                     string name = dr.GetString(1);
                     string Dept = dr.GetString(2);
-                    Console.WriteLine("{0,-6} {1,-12} {2,-10}",id,name,Dept);
+                    string courseId = dr.IsDBNull(3) ? "N/A" : dr.GetInt32(3).ToString();   // Null check for courses
+                    string courseName = dr.IsDBNull(4) ? "No Courses" : dr.GetString(4);
+            
+                    if (id != currentFacultyId)
+                    {
+                        if (!firstCourse) Console.WriteLine(); 
+                        Console.Write("{0,-6} {1,-12} {2,-15}", id, name, Dept);
+                        currentFacultyId = id;
+                        firstCourse = false;
+                    }
+                    if (!dr.IsDBNull(3))
+                    {
+                        Console.Write($"{courseName} (ID: {courseId}), ");
+                    }
+                    else
+                    {
+                        Console.Write("No courses found");
+                    }
                 }
+                Console.WriteLine();
                 dr.Close();
             }
         }
